@@ -9,7 +9,6 @@ BASE_URL = "https://books.toscrape.com/"
 DATA_DIR = "data"
 CSV_PATH = os.path.join(DATA_DIR, "books.csv")
 
-
 def extract_books(pages=1):
     books = []
     book_id = 1

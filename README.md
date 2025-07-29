@@ -34,12 +34,12 @@ Esta API implementada em Python com FastAPI extrai informações de livros do si
 ```
 biblioteca/
 ├── app/
-│   ├── main.py
 │   ├── scraper.py
 │   ├── models.py
 │   └── utils.py
 ├── data/
 │   └── books.csv
+├── main.py
 ├── requirements.txt
 └── README.md
 ```

@@ -11,12 +11,12 @@ app = FastAPI(title="Biblioteca API", version="1.0")
 @app.get("/api/v1/extrair/{pages}")
 def extrair_e_salvar(pages: int):
     try:
-        if (pages >= 0 and pages <= 5) or pages == 50:
+        if (pages >= 0 and pages <= 10) or pages == 50:
             extract_books(pages=pages)
             df = load_books()
             return {"status": "ok", "books_count": len(df)}
         else:
-            raise HTTPException(status_code=400, detail="Número de páginas deve ser entre 1 e 5 ou 50 para extrair todas as paginas")
+            raise HTTPException(status_code=400, detail="Número de páginas deve ser entre 1 e 10 ou 50 para extrair todas as paginas")
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
