@@ -9,40 +9,88 @@ Esta API implementada em Python com FastAPI extrai informações de livros do si
 - pip
 
 
-## 📄 Requirements.txt
-- Todas as bibliotecas utilizadas no projeto estão informados nesse arquivo.
-
-
-## 🔧 Instalação e configuração
-#### 1. Clone o repositório ou copie os arquivos.
-#### 2. Crie um ambiente virtual e ative.
-
-- python -m venv venv
-- source venv/bin/activate  # Linux/macOS
-- venv\Scripts\activate     # Windows
-
-#### 3. Instalação de dependências, bibliotecas utilizadas no projeto.
-- pip install -r requirements.txt
-
-
-## 🔧 Inicie o servidor
-- uvicorn main:app --reload
-
-
 ## 🗂️ Estrutura do Projeto
 
 ```
 biblioteca/
 ├── app/
-│   ├── scraper.py
-│   ├── models.py
-│   └── utils.py
+│   ├── scraper.py         # Scraper de livros e utilitários de unificação
+│   ├── models.py          # Modelos ML serializados
+│   └── utils.py           # Funções auxiliares auxiliam na consulta das informações
 ├── data/
-│   └── books.csv
-├── main.py
-├── requirements.txt
+│   └── books.csv          # CSVs exportados e unificados
+├── main.py                # Inicializador do pipeline e da API
+├── requirements.txt       # Dependências do projeto com as bibliotecas utilizada
 └── README.md
 ```
+
+
+
+## ⚙️ Como Executar o Projeto
+
+### 1. Clone o repositório
+
+```bash
+git clone <https://github.com/fernandotedokon/desafio_tech_fiap.git>
+cd desafio_tech_fiap
+```
+
+### 2. Crie e ative um ambiente virtual
+
+```bash
+python -m venv venv
+source venv/bin/activate  # Linux/macOS
+venv\Scripts\activate     # Windows
+```
+
+### 3. Instale as dependências
+
+```bash
+pip install -r requirements.txt
+```
+
+### 4. Execute o Web Scraping executando a rota (opcional, se já houver CSV)
+
+```bash
+/api/v1/extrair/{pages}
+
+Esse método extrai e salva livros de acordo com o número de páginas informado. Você pode solicitar entre 1 a 5 páginas ou exatamente 50 páginas para extrair todos os dados. Ele chama uma função que faz a extração, carrega os livros e retorna a quantidade de livros extraídos.
+```
+
+Isso irá baixar os dados dos livros e gerar os arquivos CSV em `data/books.csv`.
+
+
+### 5. Inicie o FlastAPI
+
+```bash
+uvicorn main:app --reload
+```
+
+### 6. Swagger - Verificar todas as rotas criadas funcionalidades disponiveis
+
+No swagger você poderá verificar e executar todas as rotas criadas.
+```bash
+http://127.0.0.1:8000/docs
+```
+
+
+---
+
+
+## 📡 Principais Endpoints
+
+| Método | Rota                                    | Descrição |
+|--------|-----------------------------------------|-----------|
+| GET    | /api/v1/extrair/{pages}                 | Extrai e salva livros de acordo número de páginas informado |
+| GET    | /api/v1/health                          | Verifica status da API |
+| GET    | /api/v1/books                           | Lista todos os livros |
+| GET    | /api/v1/books/{id}                      | Detalha um livro |
+| GET    | /api/v1/books/search?title=&category=   | Busca por título/categoria |
+| GET    | /api/v1/categories                      | Lista categorias únicas |
+
+
+
+
 
 
 ## 🧠 scraper.py: Extração dos livros
@@ -102,6 +150,101 @@ biblioteca/
 #### /api/v1/categories
 - Essa rota retorna todas as categorias de livros disponíveis na sua biblioteca.
 
-## ✅ Para executar as funcionalidades disponiveis
-- http://127.0.0.1:8000/docs
 
+
+
+---
+## 🧭 Plano Arquitetural (Pipeline e Escalabilidade)
+
+### 🔄 Pipeline da Solução
+
+```
+      ┌─────────────┐
+      │ books.toscrape.com
+      └──────┬──────┘
+             │  (requests + BS4)
+             ▼
+      ┌────────────────┐
+      │ Scraper Python │
+      │ scraper.py     │
+      └──────┬─────────┘
+             ▼  (CSV: pandas)
+      ┌────────────────────┐
+      │  data/books.csv    │
+      └──────┬─────────────┘
+             ▼
+      ┌────────────────────┐
+      │   FastAPI backend  │
+      │   main.py + models │
+      └──────┬─────────────┘
+             ▼
+      ┌────────────────────┐
+      │  REST Endpoints    │
+      └──────┬─────────────┘
+             ▼
+     ┌────────────────────────┐
+     │   Cientistas de Dados  │
+     │   Frontends / ML / BI  │
+     └────────────────────────┘
+```
+
+
+## 🧱 Arquitetura Pensada para Escalabilidade Futura
+
+| Componente      | Escalável? | Estratégia                                                |
+| --------------- | ---------- | --------------------------------------------------------- |
+| Scraper         | ✅          | Tornar assíncrono, paralelizar scraping por páginas       |
+| Armazenamento   | ⚠️ CSV     | Migrar para PostgreSQL, MongoDB, ou S3                    |
+| API FastAPI     | ✅          | Pode escalar horizontalmente com Gunicorn/Uvicorn         |
+| Modelo de Dados | ✅          | Pydantic permite validação forte                          |
+| Deploy          | ✅          | Docker, Kubernetes, serverless (AWS Lambda + API Gateway) |
+
+
+
+## 🧠 Caso de Uso para Cientistas de Dados / ML
+
+### 🎯 Cenário
+Objetivo: Cientistas de dados querem explorar livros para entender preferências por categorias, preços, disponibilidade e aplicar técnicas de NLP.
+
+💼 Aplicações:
+🔍 Análise exploratória de dados (EDA)
+
+📊 Dashboard com Streamlit, Dash ou Power BI
+
+🤖 Treinamento de modelos de recomendação ou classificação de livros por categoria
+
+🧠 Análise de sentimento via scraping de reviews (futuro)
+
+
+
+## 🧠 Integração com Modelos de Machine Learning
+
+### 🧩 Plano de Integração
+| Etapa             | Detalhes                                                                       |
+| ----------------- | ------------------------------------------------------------------------------ |
+| Dados             | `books.csv` como entrada para pré-processamento                                |
+| Pré-processamento | Limpeza, encoding de `rating`, one-hot de `category`, transformação de `price` |
+| Treinamento       | Classificadores, clusterização de livros, sistemas de recomendação             |
+| API ML            | Servir modelo via FastAPI ou usar ferramenta como BentoML ou TorchServe        |
+| Integração        | Nova rota `/api/v1/predict` que recebe dados de entrada e retorna previsão     |
+
+
+## 🔄 Exemplo de Rota Futuro:
+
+```bash
+@app.post("/api/v1/predict")
+def predict(data: Book):
+    # Preprocessar dados
+    # Carregar modelo treinado
+    # Retornar resultado
+    return {"categoria_prevista": "Fiction"}
+```
+
+
+## 📈 Sugestão para Pipeline de ML
+
+```bash
+data/books.csv ──> Jupyter Notebook ──> Modelo treinado (.pkl/.joblib)
+                                           │
+FastAPI ── /predict ────────> Carrega modelo e retorna inferência
+```
