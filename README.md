@@ -77,7 +77,7 @@ http://127.0.0.1:8000/docs
 ---
 
 
-## 📡 Principais Endpoints
+## 📡 Principais Endpoints Core
 
 | Método | Rota                                    | Descrição |
 |--------|-----------------------------------------|-----------|
@@ -89,6 +89,15 @@ http://127.0.0.1:8000/docs
 | GET    | /api/v1/categories                      | Lista categorias únicas |
 
 
+## 📡 Endpoints de Insights
+
+| Método | Rota                                    | Descrição |
+|--------|-----------------------------------------|-----------|
+| GET    | /api/v1/stats/overview                  | Estatísticas gerais da coleção (total de livros, preço médio, distribuição de ratings) |
+| GET    | /api/v1/stats/categories                | Estatísticas detalhadas por categoria (quantidade de livros, preços por categoria) |
+| GET    | /api/v1/books/top-rated                | Lista os livros com melhor avaliação
+(rating mais alto) |
+| GET    | /api/v1/books/price-range                | Filtra livros dentro de uma faixa de preço específica |
 
 
 
@@ -104,6 +113,8 @@ http://127.0.0.1:8000/docs
 ## 🛠 utils.py: Funções auxiliares
 - Os métodos do arquivo utils.py são funções auxiliares que ajudam a manipular e consultar uma base de dados de livros armazenada em um arquivo CSV.
 
+
+
 #### 1. load_books(): 
 - Carrega todos os livros do arquivo CSV e retorna um DataFrame do pandas com esses dados.
 
@@ -116,39 +127,71 @@ http://127.0.0.1:8000/docs
 #### 4. get_categories(): 
 - Lista todas as categorias de livros disponíveis, sem repetições, em ordem alfabética.
 
+#### 5. get_stats_overview(): 
+- Mostra o resumo do tamanho da coleção, quanto, em média, eles custam e como as avaliações estão distribuídas.
+
+#### 6. get_stats_by_category(): 
+- Fornece uma visão geral das categorias de livros, incluindo quantos livros há em cada uma e os preços médios, máximos e mínimos.
+
+#### 7. get_top_rated_books(): 
+- Verifica a avaliação mais alta entre os livros e seleciona aqueles que receberam essa nota máxima.
+
+
+
 
 
 ## 🚀 main.py: Rotas da API
 - Os métodos do arquivo main.py são responsáveis por criar e gerenciar a API da sua biblioteca.
 
+---
 📁 Extrair Dados
 #### /api/v1/extrair/{pages}
 - Esse método extrai e salva livros de acordo com o número de páginas informado. Você pode solicitar entre 1 a 5 páginas ou exatamente 50 páginas para extrair todos os dados. Ele chama uma função que faz a extração, carrega os livros e retorna a quantidade de livros extraídos.
 
-
+---
 ✅ Health Check
 #### /api/v1/health
 - Essa rota verifica se a API está funcionando bem. Ela tenta carregar os livros e retorna um status "ok" junto com a quantidade de livros disponíveis. É como um teste de saúde do sistema.
 
-
+---
 📚 Listar Todos os Livros
 #### /api/v/books
 - Aqui você consegue listar todos os livros disponíveis na sua biblioteca. Ela retorna uma lista com os detalhes de cada livro.
 
-
+---
 🔍 Buscar Livro por ID
 #### /api/v1/books/{id}
 - Essa rota busca um livro específico pelo seu ID. Se encontrar, retorna os detalhes do livro; se não, informa que o livro não foi encontrado.
 
-
+---
 🔎 Buscar por Título e/ou Categoria
 #### /api/v1/books/search
 - Essa busca permite procurar livros pelo título ou pela categoria. Você pode passar um ou ambos os parâmetros para filtrar os resultados.
 
-
+---
 📂 Listar Categorias
 #### /api/v1/categories
 - Essa rota retorna todas as categorias de livros disponíveis na sua biblioteca.
+
+---
+📊 Visão geral sobre uma coleção de livros
+#### /api/v1/stats/overview
+- É uma maneira bem prática de obter uma visão rápida e resumida sobre os livros que estão no sistema
+
+---
+📊 Fornece estatísticas por categoria
+#### /api/v1/stats/categories
+- Muito útil para dashboards ou análises por área temática, retorna a quantidade de livros, preço médio, máximo e mínimo por categoria.
+
+---
+📊 Fornece todos os livros com avaliação máxima
+#### /api/v1/books/top-rated
+- Mostra os melhores livros da base.
+
+---
+📊 Buscar livros que estão dentro de uma faixa de preço específica
+#### /api/v1/books/price-range
+- Você pode informar um valor mínimo e um valor máximo, e ela vai retornar uma lista de livros cujo preço está entre esses dois valores.
 
 
 
